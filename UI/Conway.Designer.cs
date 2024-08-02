@@ -28,19 +28,39 @@
         /// </summary>
         private void InitializeComponent()
         {
+            GridCanvas = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)GridCanvas).BeginInit();
             SuspendLayout();
             // 
-            // Form1
+            // GridCanvas
+            // 
+            GridCanvas.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            GridCanvas.BackColor = System.Drawing.Color.White;
+            GridCanvas.Location = new Point(12, 115);
+            GridCanvas.Name = "GridCanvas";
+            GridCanvas.Size = new Size(732, 500);
+            GridCanvas.TabIndex = 0;
+            GridCanvas.TabStop = false;
+            GridCanvas.Resize += new System.EventHandler(this.GridCanvas_Resize);
+            GridCanvas.Paint += new System.Windows.Forms.PaintEventHandler(this.GridCanvas_Paint);
+            // 
+            // Conway
             // 
             AutoScaleDimensions = new SizeF(9F, 21F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
-            Name = "GridUI";
-            Text = "GridUI";
+            ClientSize = new Size(756, 627);
+            Controls.Add(GridCanvas);
+            Name = "Conway";
+            Text = "Conway";
             Load += Form1_Load;
+            ((System.ComponentModel.ISupportInitialize)GridCanvas).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
+
+        private PictureBox GridCanvas;
     }
 }

@@ -2,45 +2,43 @@
 {
     public class CellGrid
     {
-        public int Height { get; set; }
-        public int Width { get; set; }
+        public int Rows { get; set; }
+        public int Cols { get; set; }
 
         public Cell[,] Grid;
 
-        public CellGrid(int height, int width)
+        private IGridSeed _seed;
+        private INeighbourCoordinates _neighbourCoordinates;
+        public CellGrid(int rows, int cols, IGridSeed seed, INeighbourCoordinates neighbourCoordinates)
         {
-            Height = height;
-            Width = width;
+            Rows = rows;
+            Cols = cols;
 
-            Grid = new Cell[Height, Width];
+            _seed = seed;
+            _neighbourCoordinates = neighbourCoordinates;
 
-            for (int row = 0; row < Height; row++)
+            if (_seed != null)
             {
-                for (int col = 0; col < Width; col++) 
+                Grid = _seed.Seed(rows, cols);
+            }
+            else
+            {
+                Grid = new Cell[Rows, Cols];
+                for (int row = 0; row < Rows; row++)
                 {
-                    Grid[row, col] = new Cell(row, col);
+                    for (int col = 0; col < Cols; col++)
+                    {
+                        Grid[row, col] = new Cell(row, col);
+                    }
                 }
             }
         }
 
-        public static List<(int, int)> GetNeighboursCoords(int y, int x)
-        {
-            return [
-                (y, x + 1),
-                (y, x + 2),
-                (y - 1, x),
-
-                (y + 1, x - 1),
-                (y + 1, x),
-                (y + 1, x + 2)
-            ];
-        }
-
         public void UpdateGrid()
         {
-            for (int row = 0; row < Height; row++)
+            for (int row = 0; row < Rows; row++)
             {
-                for (int col = 0; col < Width; col++)
+                for (int col = 0; col < Cols; col++)
                 {
                     var cell = Grid[row, col];
 
@@ -53,7 +51,12 @@
         {
             cell.Neighbours = [];
 
-            foreach (var c in GetNeighboursCoords(cell.Y, cell.X))
+            if(_neighbourCoordinates == null)
+            {
+                return;
+            }
+
+            foreach (var c in _neighbourCoordinates.GetNeighbourCoordinates(cell.Y, cell.X, Rows, Cols))
             {
                 var ny = c.Item1;
                 var nx = c.Item2;

@@ -19,7 +19,9 @@ namespace Tests
                 (11, 12)
             ];
 
-            var actual = CellGrid.GetNeighboursCoords(10, 10);
+            var nc = new NeighbourCoordinates();
+
+            var actual = nc.GetNeighbourCoordinates(10, 10, 10, 10);
 
             for (int i = 0; i < expected.Count; i++)
             {
