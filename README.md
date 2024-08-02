@@ -1,1 +1,1 @@
-# convey-life-hex
+# conway-life-hex
