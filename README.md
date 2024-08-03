@@ -1,4 +1,4 @@
-# Conway's "Life" On Hex Grid
+# Conway's "Life" On a Hex Grid
 <br/>
 
 ![conway](https://github.com/user-attachments/assets/4019a8be-3433-4e48-b0a3-92ad615cad2a)
