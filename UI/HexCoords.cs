@@ -2,6 +2,7 @@
 {
     public class HexCoords
     {
+        // Get polygon verticles based on hexagon height and table position
         public static PointF[] GetPoints(
             float hexHeight,
             float row,

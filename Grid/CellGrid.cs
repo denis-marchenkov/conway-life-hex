@@ -6,16 +6,17 @@
         public int Cols { get; set; }
 
         public Cell[,] Grid;
+        public Cell[,] _nextGen;
 
         private IGridSeed _seed;
-        private INeighbourCoordinates _neighbourCoordinates;
-        public CellGrid(int rows, int cols, IGridSeed seed, INeighbourCoordinates neighbourCoordinates)
+        private ICellCoordinates _cellCoordinates;
+        public CellGrid(int rows, int cols, IGridSeed seed, ICellCoordinates cellCoordinates)
         {
             Rows = rows;
             Cols = cols;
 
             _seed = seed;
-            _neighbourCoordinates = neighbourCoordinates;
+            _cellCoordinates = cellCoordinates;
 
             if (_seed != null)
             {
@@ -23,19 +24,14 @@
             }
             else
             {
-                Grid = new Cell[Rows, Cols];
-                for (int row = 0; row < Rows; row++)
-                {
-                    for (int col = 0; col < Cols; col++)
-                    {
-                        Grid[row, col] = new Cell(row, col);
-                    }
-                }
+                Grid = FreshGrid(rows, cols);
             }
         }
 
         public void UpdateGrid()
         {
+            _nextGen = FreshGrid(Rows, Cols);
+
             for (int row = 0; row < Rows; row++)
             {
                 for (int col = 0; col < Cols; col++)
@@ -45,23 +41,33 @@
                     MutateCell(cell);
                 }
             }
+
+            Grid = _nextGen;
+
         }
 
         private void MutateCell(Cell cell)
         {
             cell.Neighbours = [];
 
-            if(_neighbourCoordinates == null)
+            if(_cellCoordinates == null)
             {
                 return;
             }
 
-            foreach (var c in _neighbourCoordinates.GetNeighbourCoordinates(cell.Y, cell.X, Rows, Cols))
+            _nextGen[cell.Y, cell.X].Type = cell.Type;
+
+            foreach (var c in _cellCoordinates.GetNeighbourCoordinates(cell.Y, cell.X))
             {
                 var ny = c.Item1;
                 var nx = c.Item2;
 
-                if (nx < 0 || ny < 0) continue;
+                if (_cellCoordinates.IsOutOfBounds(ny, nx, Rows, Cols))
+                {
+                    cell.State = CellState.DEAD;
+                  
+                    continue;
+                }
 
                 var neighbour = Grid[ny, nx];
 
@@ -70,18 +76,37 @@
                 cell.Neighbours.Add(neighbour);
             }
 
-            if(cell.IsAlive && (cell.IsOverpopulated() || cell.IsUnderpopulated()))
+            if(cell.IsOverpopulated() || cell.IsUnderpopulated())
             {
                 cell.State = CellState.DEAD;
+                _nextGen[cell.Y, cell.X].State = CellState.DEAD;
                 return;
             }
 
             if (cell.IsSurvivor())
             {
-                return;
+                _nextGen[cell.Y, cell.X].State = CellState.ALIVE;
+               return;
             }
 
-            cell.Reproduce();
+
+            var newCell = cell.Reproduce();
+
+            _nextGen[cell.Y, cell.X] = newCell;
+        }
+
+        private Cell[,] FreshGrid(int rows, int cols)
+        {
+            var grid = new Cell[rows, cols];
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < cols; col++)
+                {
+                    grid[row, col] = new Cell(row, col);
+                }
+            }
+
+            return grid;
         }
     }
 }

@@ -1,13 +1,14 @@
 ﻿namespace Grid
 {
+    // Populate initial grid with a random percent of live cells
     public class GridSeed : IGridSeed
     {
-        private INeighbourCoordinates _neighbourCoordinates;
+        private ICellCoordinates _cellCoordinates;
 
         private int _livePercent;
-        public GridSeed(INeighbourCoordinates neighbourCoordinates, int livePercent)
+        public GridSeed(ICellCoordinates cellCoordinates, int livePercent)
         {
-            _neighbourCoordinates = neighbourCoordinates;
+            _cellCoordinates = cellCoordinates;
             _livePercent = livePercent;
         }
 
@@ -28,8 +29,9 @@
                 return grid;
             }
 
-
             var amount = rows * cols * _livePercent / 100;
+
+            HashSet<string> seededCells = [];
 
             Random rng = new();
             for (int i = 0; i < amount; i++)
@@ -37,31 +39,37 @@
                 var rx = rng.Next(0, cols - 1);
                 var ry = rng.Next(0, rows - 1);
 
+                if (seededCells.Contains(_cellCoordinates.ToString(ry, rx)))
+                {
+                    continue;
+                }
+
+                seededCells.Add($"{ry}_{rx}");
+
                 var cell = grid[ry, rx];
                 cell.State = CellState.ALIVE;
-                cell.Type = GetRandomType();
+                cell.Type = Cell.GetRandomType();
 
-                var neighbourCoords = _neighbourCoordinates.GetNeighbourCoordinates(ry, rx, rows, cols);
+                var neighbourCoords = _cellCoordinates.GetNeighbourCoordinates(ry, rx);
 
-                foreach(var nc in neighbourCoords)
+                foreach (var nc in neighbourCoords.Take(rng.Next(neighbourCoords.Count)))
                 {
-                    var neighbour = grid[nc.Item1, nc.Item2];
+                    var ny = nc.Item1;
+                    var nx = nc.Item2;
+
+                    seededCells.Add(_cellCoordinates.ToString(ny, nx));
+                    if (_cellCoordinates.IsOutOfBounds(ny, nx, rows, cols))
+                    {
+                        continue;
+                    }
+
+                    var neighbour = grid[ny, nx];
                     neighbour.State = CellState.ALIVE;
-                    neighbour.Type = GetRandomType();
+                    neighbour.Type = Cell.GetRandomType();
                 }
             }
-
             return grid;
-        }
-
-        private CellType GetRandomType()
-        {
-            Random rng = new();
-            var cellTypes = Enum.GetValues<CellType>().ToList();
-            cellTypes.Remove(CellType.UNDEFINED);
-            CellType type = cellTypes[rng.Next(cellTypes.Count)];
-
-            return type;
         }
     }
 }
+

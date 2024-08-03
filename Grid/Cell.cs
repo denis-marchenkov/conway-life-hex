@@ -1,9 +1,9 @@
 ﻿namespace Grid
 {
-    public class Cell(int x, int y)
+    public class Cell(int y, int x)
     {
-        public int X { get; set; } = x;
         public int Y { get; set; } = y;
+        public int X { get; set; } = x;
         public CellType Type { get; set; } = CellType.UNDEFINED;
         public CellState State { get; set; } = CellState.DEAD;
         public List<Cell> Neighbours { get; set; } = [];
@@ -11,14 +11,15 @@
         public bool IsAlive => State == CellState.ALIVE;
 
 
-        // Any live cell with less than two live neighbours dies of underpopulation.
+        #region rules
+        // Any live cell with less than two live neighbours of its type dies of underpopulation.
         public bool IsUnderpopulated()
         {
-            return IsAlive && Neighbours.Count < 2;
+            return IsAlive && Neighbours.Count(x => x.Type == Type) < 2;
         }
 
 
-        // Any live cell with more than three live neighbours dies of overpopulation.
+        // Any live cell with more than three live neighbours of any type dies of overpopulation.
         public bool IsOverpopulated()
         {
             return IsAlive && Neighbours.Count > 3;
@@ -30,30 +31,37 @@
         {
             var neighbours = Neighbours.Where(x => x.Type == Type).ToList();
 
-            return IsAlive && neighbours.Count is not 0 and (2 or 3);
+            return IsAlive && neighbours.Count is 2 or 3;
         }
 
 
-        // Any dead cell with three live neighbours of the same type becomes live cell.
-        // If it's a tie between two groups of three cells of two different types - it stays dead.
-        public void Reproduce()
+        // Any dead cell with two live neighbours of the same type becomes live cell.
+        // If there are other pairs (or more) cells with different types around it - it stays dead.
+        public Cell Reproduce()
         {
-            if(State == CellState.ALIVE) return;
+            if(State == CellState.ALIVE) return this;
 
             var grp = Neighbours.GroupBy(x => x.Type).Where(x => x.Key != CellType.UNDEFINED)
                 .Select(x => new
                 {
                     Type = x.Key,
                     Count = x.Count()
-                })
-                .Where(x => x.Count == 3);
+                });
 
-            if (!grp.Any() || grp.Count() == 2) return;
+            if (!grp.Any(x => x.Count == 2) || grp.Any(x => x.Count > 2)) return this;
 
-            State = CellState.ALIVE;
+            return new Cell(Y, X) { State = CellState.ALIVE, Type = grp.First().Type, Neighbours = Neighbours };
+        }
+        #endregion rules
 
-            Type = grp.First().Type;
+        public static CellType GetRandomType()
+        {
+            Random rng = new();
+            var cellTypes = Enum.GetValues<CellType>().ToList();
+            cellTypes.Remove(CellType.UNDEFINED);
+            CellType type = cellTypes[rng.Next(cellTypes.Count)];
 
+            return type;
         }
 
     }

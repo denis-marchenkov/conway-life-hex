@@ -31,6 +31,7 @@ namespace Tests
         [Test]
         public void IsUnderpopulated_False_Test()
         {
+            _cell.Type = CellType.RED;
             _cell.Neighbours =
                 [
                     new Cell(0, 0) { Type = CellType.RED },
@@ -72,8 +73,8 @@ namespace Tests
         [Test]
         public void Reproduce_False_Test()
         {
-            _cell.Reproduce();
-            Assert.That(_cell.Type, Is.EqualTo(CellType.UNDEFINED));
+            var actual = _cell.Reproduce();
+            Assert.That(actual.Type, Is.EqualTo(CellType.UNDEFINED));
         }
 
         [Test]
@@ -91,14 +92,14 @@ namespace Tests
                 new Cell(0, 0) { Type = CellType.GREEN },
             ];
 
-            _cell.Reproduce();
+            var actual = _cell.Reproduce();
 
-            Assert.That(_cell.State, Is.EqualTo(CellState.DEAD));
-            Assert.That(_cell.Type, Is.EqualTo(CellType.UNDEFINED));
+            Assert.That(actual.State, Is.EqualTo(CellState.DEAD));
+            Assert.That(actual.Type, Is.EqualTo(CellType.UNDEFINED));
         }
 
         [Test]
-        public void Reproduce_True_Test()
+        public void Reproduce_Competitor_Test()
         {
             _cell.State = CellState.DEAD;
             _cell.Neighbours =
@@ -109,13 +110,35 @@ namespace Tests
 
                 new Cell(0, 0) { Type = CellType.GREEN },
                 new Cell(0, 0) { Type = CellType.GREEN },
-
             ];
 
-            _cell.Reproduce();
+            var actual = _cell.Reproduce();
 
-            Assert.That(_cell.State, Is.EqualTo(CellState.ALIVE));
-            Assert.That(_cell.Type, Is.EqualTo(CellType.RED));
+            Assert.That(actual.State, Is.EqualTo(CellState.DEAD));
+            Assert.That(actual.Type, Is.EqualTo(CellType.UNDEFINED));
+        }
+
+        [Test]
+        public void Reproduce_True_Test()
+        {
+            _cell.State = CellState.DEAD;
+            _cell.Neighbours =
+            [
+                new Cell(0, 0) { Type = CellType.GREEN },
+                new Cell(0, 0) { Type = CellType.GREEN },
+            ];
+
+            var actual = _cell.Reproduce();
+
+            Assert.That(actual.State, Is.EqualTo(CellState.ALIVE));
+            Assert.That(actual.Type, Is.EqualTo(CellType.GREEN));
+        }
+
+        [Test]
+        public void GetRandomType_Test()
+        {
+            var actual = Cell.GetRandomType();
+            Assert.That(actual, Is.InstanceOf<CellType>());
         }
     }
 }
