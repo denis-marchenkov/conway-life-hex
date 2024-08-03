@@ -1,16 +1,13 @@
 # Conway's "Life" On Hex Grid
 <br/>
-  
+![](https://github.com/denis-marchenkov/conway-life-hex/blob/5cbb5ba0f9320ac411892905d91b5e48cf646717/conway.gif)
 <br/>
 Variation of Conway's game of "Life" on a hexagonal grid with multiple competing cell types.
-
 <br/><br/>
 
 ## Description:
 
 Simple windows forms application since I was mainly focused on understanding hexagonal grid coordinates, "life" implementation just naturally came along.
-
-<br/><br/>
 
 Rules are modified a bit to reflect competing cell types and hexagonal greed structure:
 
