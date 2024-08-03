@@ -11,7 +11,7 @@ Variation of Conway's game of "Life" on a hexagonal grid with multiple competing
 
 Simple windows forms application since I was mainly focused on understanding hexagonal grid coordinates, "life" implementation just naturally came along.
 
-Rules are modified a bit to reflect competing cell types and hexagonal greed structure:
+Rules are modified a bit to reflect competing cell types and hexagonal grid structure:
 
 * Any live cell with less than two live neighbours of its type dies of underpopulation;
 * any live cell with more than three live neighbours of any type dies of overpopulation;
