@@ -1,6 +1,8 @@
 # Conway's "Life" On Hex Grid
 <br/>
-![](https://github.com/denis-marchenkov/conway-life-hex/blob/5cbb5ba0f9320ac411892905d91b5e48cf646717/conway.gif)
+
+![conway](https://github.com/user-attachments/assets/4019a8be-3433-4e48-b0a3-92ad615cad2a)
+
 <br/>
 Variation of Conway's game of "Life" on a hexagonal grid with multiple competing cell types.
 <br/><br/>
